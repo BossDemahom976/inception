@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sleep 10
 wp config create	--allow-root \
 					--dbname=${SQL_DATABASE} \
 					--dbuser=${SQL_USER} \
@@ -14,7 +13,8 @@ wp core install		--allow-root \
 					--admin_email=${WP_ADMIN_EMAIL} \
 					--path=/var/www/wordpress
 wp user create		--allow-root \
-					${WP_USER} ${WP_USER_MAIL} --role=author
+					${WP_USER} ${WP_USER_MAIL} --role=author \
+					--path=/var/www/wordpress
 
 mkdir -p /run/php
 
