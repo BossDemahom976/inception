@@ -1,13 +1,13 @@
 all:
-	mkdir -p /Users/homohame/data/wordpress
-	mkdir -p /Users/homohame/data/mariadb
+	mkdir -p homohame/data/wordpress
+	mkdir -p homohame/data/mariadb
 	docker compose up -d --build
 
 down:
-	docker compose down
+	docker compose down -v
 
 clean: down
 	docker system prune -a
-	rm -rf /Users/homohame/data
+	rm -rf homohame
 
 .PHONY: all down clean
