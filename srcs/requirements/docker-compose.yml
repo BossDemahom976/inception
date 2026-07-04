@@ -4,7 +4,7 @@ services:
   networks:
    - inception
   build:
-   context: srcs/requirements/mariadb
+   context: requirements/mariadb
    dockerfile: Dockerfile
   env_file: .env
   volumes:
@@ -22,7 +22,7 @@ services:
   depends_on:
    - wordpress
   build:
-   context: srcs/requirements/nginx
+   context: requirements/nginx
    dockerfile: Dockerfile
   env_file: .env
   ports:
@@ -37,7 +37,7 @@ services:
   networks:
    - inception
   build:
-   context: srcs/requirements/wordpress
+   context: requirements/wordpress
    dockerfile: Dockerfile
   depends_on:
    - mariadb
@@ -51,13 +51,13 @@ volumes:
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: 'homohame/data/wordpress'
+   device: '../homohame/data/wordpress'
  mariadb:
   driver: local
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: 'homohame/data/mariadb'
+   device: '../homohame/data/mariadb'
 
 networks:
  inception:

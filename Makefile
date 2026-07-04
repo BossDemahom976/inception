@@ -1,12 +1,12 @@
 all:
 	mkdir -p homohame/data/wordpress
 	mkdir -p homohame/data/mariadb
-	docker compose up -d --build
+	docker compose -f srcs/docker-compose.yml up -d --build
 
 down:
-	docker compose down -v
+	docker compose -f srcs/docker-compose.yml down
 
-clean: down
+fclean: down
 	docker system prune -a
 	rm -rf homohame
 

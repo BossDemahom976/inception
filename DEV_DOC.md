@@ -149,14 +149,12 @@ docker compose -f srcs/docker-compose.yml up -d --build nginx
 
 ```bash
 make down
-# equivalent to: docker compose -f srcs/docker-compose.yml down
 ```
 
 ### Full cleanup
 
 ```bash
 make fclean
-# equivalent to: docker compose -f srcs/docker-compose.yml down --rmi all
 ```
 
 > This removes containers and images but does **not** delete volume data at `/home/homohame/data/`.
