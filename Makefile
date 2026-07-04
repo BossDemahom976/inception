@@ -4,7 +4,7 @@ all:
 	docker compose up -d --build
 
 down:
-	docker compose down
+	docker compose down -v
 
 clean: down
 	docker system prune -a
