@@ -9,6 +9,8 @@ This guide explains how to set up, build, and manage the Inception infrastructur
 Before starting, make sure your Virtual Machine has the following installed:
 
 ```bash
+# curl
+sudo apt install curl
 # Docker
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
@@ -18,7 +20,7 @@ sudo usermod -aG docker $USER
 sudo apt-get install docker-compose-plugin
 
 # make
-sudo apt-get install make
+sudo apt-get install build-essential
 
 # Verify
 docker --version
@@ -36,12 +38,9 @@ make --version
 ├── README.md
 ├── USER_DOC.md
 ├── DEV_DOC.md
-├── secrets/                        ← gitignored, must be created manually
-│   ├── credentials.txt             ← WordPress admin password
-│   ├── db_password.txt             ← MariaDB user password
-│   └── db_root_password.txt        ← MariaDB root password
+├── secrets/
 └── srcs/
-    ├── .env                        ← Non-sensitive config variables
+    ├── .env                        ← config variables
     ├── docker-compose.yml
     └── requirements/
         ├── mariadb/
@@ -69,56 +68,32 @@ git clone <repo_url> inception
 cd inception
 ```
 
-### 2. Create the secrets directory and files
-
-These files are **gitignored** — you must create them manually. Never commit them.
-
-```bash
-mkdir -p secrets
-
-echo "your_db_user_password" > secrets/db_password.txt
-echo "your_db_root_password" > secrets/db_root_password.txt
-echo "your_wp_admin_password" > secrets/credentials.txt
-
-# Restrict permissions
-chmod 600 secrets/*.txt
-```
-
-### 3. Configure the `.env` file
+### 2. Configure the `.env` file
 
 Edit `srcs/.env` to match your environment:
 
 ```dotenv
 DOMAIN_NAME=homohame.42.fr
-
-# MySQL/MariaDB
-MYSQL_DATABASE=wordpress
-MYSQL_USER=wpuser
-
-# WordPress admin
-WP_ADMIN_USER=homohame_admin
+# SQL SETUP
+SQL_USER=homohame
+SQL_PASSWORD=
+SQL_DATABASE=database
+SQL_ROOT_PASSWORD=
+# WP SETUP
+WP_TITLE=Inception
+WP_ADMIN=houssen
+WP_ADMIN_PASSWORD=
 WP_ADMIN_EMAIL=homohame@student.42.fr
-WP_USER=editor
-WP_USER_EMAIL=editor@student.42.fr
+WP_USER=user1
+WP_USER_MAIL=user1@user.fr
 ```
 
-> Passwords are NOT stored here — they are loaded from `secrets/` files at runtime.
-
-### 4. Configure the domain name
+### 3. Configure the domain name
 
 Add the domain to `/etc/hosts` on your VM (and on your host if you want to access it from a browser outside the VM):
 
 ```bash
 echo "127.0.0.1 homohame.42.fr" | sudo tee -a /etc/hosts
-```
-
-### 5. Create the data directories
-
-The named volumes mount to these paths on the host. Create them beforehand to avoid permission issues:
-
-```bash
-mkdir -p /home/homohame/data/wordpress
-mkdir -p /home/homohame/data/mariadb
 ```
 
 ---
@@ -128,12 +103,14 @@ mkdir -p /home/homohame/data/mariadb
 ### Build and start
 
 ```bash
-make
+sudo make
 ```
 
 This runs:
 
 ```bash
+mkdir -p homohame/data/wordpress
+mkdir -p homohame/data/mariadb
 docker compose -f srcs/docker-compose.yml up -d --build
 ```
 
@@ -148,21 +125,13 @@ docker compose -f srcs/docker-compose.yml up -d --build nginx
 ### Stop containers (preserve volumes)
 
 ```bash
-make down
+sudo make down
 ```
 
 ### Full cleanup
 
 ```bash
-make fclean
-```
-
-> This removes containers and images but does **not** delete volume data at `/home/homohame/data/`.
-
-To also wipe volume data:
-
-```bash
-sudo rm -rf /home/homohame/data/wordpress /home/homohame/data/mariadb
+sudo make fclean
 ```
 
 ---
@@ -218,8 +187,8 @@ The project uses two Docker named volumes defined in `docker-compose.yml`:
 
 | Volume name | Mounted in container | Host path |
 |---|---|---|
-| `srcs_wordpress` | `/var/www/html` (wordpress container) | `/home/homohame/data/wordpress` |
-| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `/home/homohame/data/mariadb` |
+| `srcs_wordpress` | `/var/www/html` (wordpress container) | `homohame/data/wordpress` |
+| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `homohame/data/mariadb` |
 
 The `driver_opts` in `docker-compose.yml` bind the named volumes to specific host paths:
 
@@ -230,13 +199,13 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/homohame/data/wordpress
+      device: homohame/data/wordpress
   mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/homohame/data/mariadb
+      device: homohame/data/mariadb
 ```
 
 ### Persistence behavior

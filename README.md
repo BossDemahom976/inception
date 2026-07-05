@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by homohame, eduzun, homohame.*
+*This project has been created as part of the 42 curriculum by homohame.*
 
 # Inception — Docker Infrastructure
 
@@ -12,7 +12,7 @@ The goal is to build, from scratch, a multi-container architecture consisting of
 - **WordPress + php-fpm** — the web application, running without NGINX
 - **MariaDB** — the relational database for WordPress
 
-All Docker images are custom-built using Dockerfiles based on the penultimate stable version of Alpine or Debian. No pre-built images are pulled from DockerHub (except the base OS). Sensitive credentials are managed through Docker secrets and a `.env` file, never hardcoded.
+All Docker images are built using Dockerfiles based on a stable version of Debian. No pre-built images are pulled from DockerHub (except the base OS). Sensitive credentials are managed through Docker secrets and a `.env` file, never hardcoded.
 
 ### Design Choices
 
