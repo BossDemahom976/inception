@@ -25,7 +25,7 @@ The only way to access the infrastructure from a browser is through **port 443 (
 From the root of the repository (on your VM):
 
 ```bash
-make
+sudo make
 ```
 
 This will build all Docker images and start the containers. On first run, it may take a few minutes to build.
@@ -41,7 +41,7 @@ You should see `nginx`, `wordpress`, and `mariadb` all with status `Up`.
 ### Stop (keep data)
 
 ```bash
-make down
+sudo make down
 ```
 
 This stops and removes the containers, but your volumes (database and WordPress files) are preserved.
@@ -49,10 +49,10 @@ This stops and removes the containers, but your volumes (database and WordPress 
 ### Full cleanup (remove everything)
 
 ```bash
-make fclean
+sudo make fclean
 ```
 
-This stops containers, removes images, and clears built artifacts. **Your volume data on the host is not deleted by this command** — it stays at `/home/homohame/data`.
+This stops containers, removes images, and clears built artifacts. **Your volume data on the host is not deleted by this command** — it stays at `inception/homohame/data`.
 
 ---
 
@@ -76,28 +76,25 @@ You will land on the WordPress website.
 https://homohame.42.fr/wp-admin
 ```
 
-Log in with the administrator credentials stored in `secrets/credentials.txt`. The admin username does **not** contain "admin" or "administrator" (as required by the project).
+Log in with the administrator credentials stored in `.env`. The admin username does **not** contain "admin" or "administrator" (as required by the project).
 
 ---
 
+
 ## Locating and Managing Credentials
 
-All sensitive credentials are stored in the `secrets/` directory at the root of the repository. These files are **gitignored** and must never be committed.
+All configuration and sensitive credentials are stored in a single `.env` file located in the `srcs/` directory. This file is **gitignored** and must never be committed to the repository.
 
-| File | Contains |
-|---|---|
-| `secrets/credentials.txt` | WordPress admin username and password |
-| `secrets/db_password.txt` | MariaDB user password |
-| `secrets/db_root_password.txt` | MariaDB root password |
+**`.env` Content Overview:**
+*	**General:** Domain name (e.g., `login.42.fr`) and other environment variables
+*	**MariaDB:** Database name, root password, standard user, and user password
+*	**WordPress:** Admin username/password, and regular user credentials
 
-Non-sensitive configuration (domain name, database username) is in `srcs/.env`.
-
-To change a password, update the corresponding file and restart the stack:
+To change a password or a configuration variable, update the `srcs/.env` file and restart the stack:
 
 ```bash
 make down
 make
-```
 
 ---
 
@@ -147,8 +144,8 @@ Enter the root password from `secrets/db_root_password.txt` when prompted.
 WordPress files and the database are stored on the host machine at:
 
 ```
-/home/homohame/data/wordpress/    ← WordPress website files
-/home/homohame/data/mariadb/      ← MariaDB database files
+inception/homohame/data/wordpress/    ← WordPress website files
+inception/homohame/data/mariadb/      ← MariaDB database files
 ```
 
 These directories are mapped into the containers via Docker named volumes. They persist even when containers are stopped or removed.

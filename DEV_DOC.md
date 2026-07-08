@@ -30,35 +30,6 @@ make --version
 
 ---
 
-## Repository Structure
-
-```
-.
-├── Makefile
-├── README.md
-├── USER_DOC.md
-├── DEV_DOC.md
-├── secrets/
-└── srcs/
-    ├── .env                        ← config variables
-    ├── docker-compose.yml
-    └── requirements/
-        ├── mariadb/
-        │   ├── Dockerfile
-        │   ├── conf/               ← MariaDB config files
-        │   └── tools/              ← Init scripts
-        ├── nginx/
-        │   ├── Dockerfile
-        │   ├── conf/               ← NGINX config + TLS cert
-        │   └── tools/
-        └── wordpress/
-            ├── Dockerfile
-            ├── conf/               ← php-fpm config
-            └── tools/              ← WP-CLI setup scripts
-```
-
----
-
 ## Environment Setup from Scratch
 
 ### 1. Clone the repository
@@ -100,7 +71,7 @@ echo "127.0.0.1 homohame.42.fr" | sudo tee -a /etc/hosts
 
 ## Building and Launching the Project
 
-### Build and start
+### Build and launch
 
 ```bash
 sudo make
@@ -128,10 +99,23 @@ docker compose -f srcs/docker-compose.yml up -d --build nginx
 sudo make down
 ```
 
+This runs:
+
+```bash
+docker compose -f srcs/docker-compose.yml down
+```
+
 ### Full cleanup
 
 ```bash
 sudo make fclean
+```
+
+This runs:
+
+```bash
+docker compose -f srcs/docker-compose.yml down
+docker system prune -a
 ```
 
 ---
@@ -187,36 +171,33 @@ The project uses two Docker named volumes defined in `docker-compose.yml`:
 
 | Volume name | Mounted in container | Host path |
 |---|---|---|
-| `srcs_wordpress` | `/var/www/html` (wordpress container) | `homohame/data/wordpress` |
-| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `homohame/data/mariadb` |
+| `srcs_wordpress` | `/var/www/html` (wordpress container) | `inception/homohame/data/wordpress` |
+| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `inception/homohame/data/mariadb` |
 
 The `driver_opts` in `docker-compose.yml` bind the named volumes to specific host paths:
 
 ```yaml
 volumes:
-  wordpress:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: homohame/data/wordpress
-  mariadb:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: homohame/data/mariadb
+ wordpress:
+  driver: local
+  driver_opts:
+   type: 'none'
+   o: 'bind'
+   device: '../homohame/data/wordpress'
+ mariadb:
+  driver: local
+  driver_opts:
+   type: 'none'
+   o: 'bind'
+   device: '../homohame/data/mariadb'
+
 ```
 
 ### Persistence behavior
 
 - Stopping containers (`make down`) does **not** affect volume data.
 - Removing images (`make fclean`) does **not** affect volume data.
-- Data only disappears if you manually delete the directories at `/home/homohame/data/`.
-
-### Docker secrets
-
-Secrets are mounted at runtime as read-only files inside each container at `/run/secrets/<secret_name>`. They are never stored in environment variables or image layers, making them invisible to `docker inspect`.
+- Data only disappears if you manually delete the directories at `inception/homohame/data/`.
 
 ---
 
@@ -225,40 +206,10 @@ Secrets are mounted at runtime as read-only files inside each container at `/run
 The NGINX container uses a self-signed TLS certificate generated with OpenSSL during image build:
 
 ```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout /etc/ssl/private/nginx.key \
-  -out /etc/ssl/certs/nginx.crt \
-  -subj "/C=FR/ST=Paris/O=42/CN=homohame.42.fr"
+openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=homohame.42.fr/UID=homohame"
+
 ```
 
 This certificate is baked into the NGINX image. It is self-signed, so browsers will show a warning — this is expected for a local dev environment.
 
 ---
-
-## Common Issues
-
-### Port 443 already in use
-
-```bash
-sudo lsof -i :443
-# Kill the process using the port, then retry make
-```
-
-### Permission denied on /home/homohame/data
-
-```bash
-sudo chown -R $USER:$USER /home/homohame/data
-```
-
-### WordPress not connecting to the database
-
-Check that MariaDB is fully initialized before WordPress starts. The WordPress entrypoint script should include a wait loop. Check logs:
-
-```bash
-docker compose -f srcs/docker-compose.yml logs mariadb
-docker compose -f srcs/docker-compose.yml logs wordpress
-```
-
-### Containers exit immediately
-
-Make sure you are not using infinite loop hacks (`tail -f`, `sleep infinity`, `while true`) as entrypoints. Use proper daemon foreground commands instead (e.g., `php-fpm8 -F`, `nginx -g 'daemon off;'`, `mysqld_safe`).

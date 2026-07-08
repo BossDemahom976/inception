@@ -8,6 +8,5 @@ down:
 
 fclean: down
 	docker system prune -a
-	rm -rf homohame
 
 .PHONY: all down clean
