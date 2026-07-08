@@ -51,13 +51,13 @@ volumes:
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: '../homohame/data/wordpress'
+   device: '/home/homohame/data/wordpress'
  mariadb:
   driver: local
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: '../homohame/data/mariadb'
+   device: '/home/homohame/data/mariadb'
 
 networks:
  inception:

@@ -74,31 +74,31 @@ git clone <repo_url> inception
 cd inception
 ```
 
-2. Create the `secrets/` directory and populate the secret files (these are gitignored):
-
-```bash
-mkdir -p secrets
-echo "your_db_password" > secrets/db_password.txt
-echo "your_db_root_password" > secrets/db_root_password.txt
-echo "your_wp_admin_password" > secrets/credentials.txt
-```
-
-3. Edit `srcs/.env` to set your domain and credentials:
+2. Edit `srcs/.env` to set your domain and credentials:
 
 ```bash
 DOMAIN_NAME=homohame.42.fr
-MYSQL_USER=wpuser
-MYSQL_DATABASE=wordpress
-# (passwords are loaded from secrets, not here)
+# SQL SETUP
+SQL_USER=homohame
+SQL_PASSWORD=
+SQL_DATABASE=database
+SQL_ROOT_PASSWORD=
+# WP SETUP
+WP_TITLE=Inception
+WP_ADMIN=houssen
+WP_ADMIN_PASSWORD=
+WP_ADMIN_EMAIL=homohame@student.42.fr
+WP_USER=user1
+WP_USER_MAIL=user1@user.fr
 ```
 
-4. Add your domain to `/etc/hosts` on the host machine:
+3. Add your domain to `/etc/hosts` on the host machine:
 
 ```bash
 echo "127.0.0.1 homohame.42.fr" | sudo tee -a /etc/hosts
 ```
 
-5. Build and start everything:
+4. Build and start everything:
 
 ```bash
 make

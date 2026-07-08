@@ -74,7 +74,7 @@ echo "127.0.0.1 homohame.42.fr" | sudo tee -a /etc/hosts
 ### Build and launch
 
 ```bash
-sudo make
+make
 ```
 
 This runs:
@@ -96,7 +96,7 @@ docker compose -f srcs/docker-compose.yml up -d --build nginx
 ### Stop containers (preserve volumes)
 
 ```bash
-sudo make down
+make down
 ```
 
 This runs:
@@ -108,7 +108,7 @@ docker compose -f srcs/docker-compose.yml down
 ### Full cleanup
 
 ```bash
-sudo make fclean
+make fclean
 ```
 
 This runs:
@@ -171,8 +171,8 @@ The project uses two Docker named volumes defined in `docker-compose.yml`:
 
 | Volume name | Mounted in container | Host path |
 |---|---|---|
-| `srcs_wordpress` | `/var/www/html` (wordpress container) | `inception/homohame/data/wordpress` |
-| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `inception/homohame/data/mariadb` |
+| `srcs_wordpress` | `/var/www/html` (wordpress container) | `/home/homohame/data/wordpress` |
+| `srcs_mariadb` | `/var/lib/mysql` (mariadb container) | `/home/homohame/data/mariadb` |
 
 The `driver_opts` in `docker-compose.yml` bind the named volumes to specific host paths:
 
@@ -183,13 +183,13 @@ volumes:
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: '../homohame/data/wordpress'
+   device: '/home/homohame/data/wordpress'
  mariadb:
   driver: local
   driver_opts:
    type: 'none'
    o: 'bind'
-   device: '../homohame/data/mariadb'
+   device: '/home/homohame/data/mariadb'
 
 ```
 
@@ -197,7 +197,7 @@ volumes:
 
 - Stopping containers (`make down`) does **not** affect volume data.
 - Removing images (`make fclean`) does **not** affect volume data.
-- Data only disappears if you manually delete the directories at `inception/homohame/data/`.
+- Data only disappears if you manually delete the directories at `/home/homohame/data/`.
 
 ---
 

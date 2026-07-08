@@ -25,7 +25,7 @@ The only way to access the infrastructure from a browser is through **port 443 (
 From the root of the repository (on your VM):
 
 ```bash
-sudo make
+make
 ```
 
 This will build all Docker images and start the containers. On first run, it may take a few minutes to build.
@@ -41,7 +41,7 @@ You should see `nginx`, `wordpress`, and `mariadb` all with status `Up`.
 ### Stop (keep data)
 
 ```bash
-sudo make down
+make down
 ```
 
 This stops and removes the containers, but your volumes (database and WordPress files) are preserved.
@@ -49,10 +49,10 @@ This stops and removes the containers, but your volumes (database and WordPress 
 ### Full cleanup (remove everything)
 
 ```bash
-sudo make fclean
+make fclean
 ```
 
-This stops containers, removes images, and clears built artifacts. **Your volume data on the host is not deleted by this command** — it stays at `inception/homohame/data`.
+This stops containers, removes images, and clears built artifacts. **Your volume data on the host is not deleted by this command** — it stays at `/home/homohame/data`.
 
 ---
 
@@ -86,7 +86,7 @@ Log in with the administrator credentials stored in `.env`. The admin username d
 All configuration and sensitive credentials are stored in a single `.env` file located in the `srcs/` directory. This file is **gitignored** and must never be committed to the repository.
 
 **`.env` Content Overview:**
-*	**General:** Domain name (e.g., `login.42.fr`) and other environment variables
+*	**General:** Domain name (`homohame.42.fr`)
 *	**MariaDB:** Database name, root password, standard user, and user password
 *	**WordPress:** Admin username/password, and regular user credentials
 
