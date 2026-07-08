@@ -1,6 +1,6 @@
 all:
-	mkdir -p homohame/data/wordpress
-	mkdir -p homohame/data/mariadb
+	mkdir -p /home/data/wordpress
+	mkdir -p /home/data/mariadb
 	docker compose -f srcs/docker-compose.yml up -d --build
 
 down:
